@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>3F3F1C35-99E2-44EE-9AC4-5A0F39E10C95</string>
+	<key>IDESourceControlProjectName</key>
+	<string>TremoloUnit</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>E08711F8A2F2BB2EE92E35EFBEB3A387E9BA8DDE</key>
+		<string>https://github.com/Pescolly/TremoloUnit.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>TremoloUnit.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>E08711F8A2F2BB2EE92E35EFBEB3A387E9BA8DDE</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/Pescolly/TremoloUnit.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>E08711F8A2F2BB2EE92E35EFBEB3A387E9BA8DDE</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>E08711F8A2F2BB2EE92E35EFBEB3A387E9BA8DDE</string>
+			<key>IDESourceControlWCCName</key>
+			<string>TremoloUnit</string>
+		</dict>
+	</array>
+</dict>
+</plist>
