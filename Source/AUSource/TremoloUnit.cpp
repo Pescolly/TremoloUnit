@@ -45,86 +45,16 @@
  
 */
 
-#include "AUEffectBase.h"
-#include <AudioToolbox/AudioUnitUtilities.h>
-#include "TremoloUnitVersion.h"
+
 #include "TremoloUnit.h"
-#include <math.h>
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#pragma mark ____TremoloUnitKernel
-
-class TremoloUnitKernel : public AUKernelBase		// the actual TremoloUnit DSP happens here
-{
-public:
-	TremoloUnitKernel(AUEffectBase *inAudioUnit );
-	virtual ~TremoloUnitKernel();
-			
-	// processes one channel of non-interleaved samples
-	virtual void 		Process(	const Float32 	*inSourceP,
-									Float32		 	*inDestP,
-									UInt32 			inFramesToProcess,
-									UInt32			inNumChannels,
-									bool &			ioSilence);
-
-	// resets the TremoloUnit state
-	virtual void		Reset();
-
-	
-			
-private:
-};
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#pragma mark ____TremoloUnit
-
-class TremoloUnit : public AUEffectBase
-{
-public:
-	TremoloUnit(AudioUnit component);
-
-	virtual OSStatus			Version() { return kTremoloUnitVersion; }
-
-	virtual OSStatus			Initialize();
-
-	virtual AUKernelBase *		NewKernel() { return new TremoloUnitKernel(this); }
-
-	// for custom property
-	virtual OSStatus			GetPropertyInfo(	AudioUnitPropertyID		inID,
-													AudioUnitScope			inScope,
-													AudioUnitElement		inElement,
-													UInt32 &				outDataSize,
-													Boolean	&				outWritable );
-
-	virtual OSStatus			GetProperty(		AudioUnitPropertyID 	inID,
-													AudioUnitScope 			inScope,
-													AudioUnitElement 		inElement,
-													void 					* outData );
 
 
-	virtual OSStatus			GetParameterInfo(	AudioUnitScope			inScope,
-													AudioUnitParameterID	inParameterID,
-													AudioUnitParameterInfo	&outParameterInfo );
-	
-    // handle presets:
-    virtual OSStatus			GetPresets(	CFArrayRef	*outData	)	const;    
-    virtual OSStatus			NewFactoryPresetSet (	const AUPreset & inNewFactoryPreset	);
 
-	// we'll report a 1ms tail.   A reverb effect would have a much more substantial tail on
-	// the order of several seconds....
-	//
-	virtual	bool				SupportsTail () { return true; }
-    virtual Float64				GetTailTime() {return 0.001;}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	// we have no latency
-	//
-	// A lookahead compressor or FFT-based processor should report the true latency in seconds
-    virtual Float64				GetLatency() {return 0.0;}
-
-
-protected:
-};
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //	Standard DSP AudioUnit implementation
@@ -166,8 +96,7 @@ static const int kPresetDefaultIndex = 0;
 //	TremoloUnit::TremoloUnit
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-TremoloUnit::TremoloUnit(AudioUnit component)
-	: AUEffectBase(component)
+TremoloUnit::TremoloUnit(AudioUnit component) : AUEffectBase(component)
 {
 	// all the parameters must be set to their initial values here
 	//
@@ -175,6 +104,8 @@ TremoloUnit::TremoloUnit(AudioUnit component)
 	// and assigning their initial values
 	//
 	// kTremoloUnitParam_CutoffFrequency max value depends on sample-rate
+	
+	
 	SetParamHasSampleRateDependency(true );
 }
 
