@@ -13,9 +13,6 @@
 #include <math.h>
 
 
-
-
-
 #pragma mark ____TremoloUnitKernel
 
 class TremoloUnitKernel : public AUKernelBase		// the actual TremoloUnit DSP happens here
@@ -67,8 +64,8 @@ public:
 													AudioUnitParameterInfo	&outParameterInfo );
 	
 		// handle presets:
-	virtual OSStatus			GetPresets(	CFArrayRef	*outData	)	const;
-	virtual OSStatus			NewFactoryPresetSet (	const AUPreset & inNewFactoryPreset	);
+	virtual OSStatus			GetPresets(CFArrayRef	*outData) const;
+	virtual OSStatus			NewFactoryPresetSet (const AUPreset &inNewFactoryPreset);
 	
 		// we'll report a 1ms tail.   A reverb effect would have a much more substantial tail on
 		// the order of several seconds....
@@ -124,3 +121,26 @@ enum
 	kParameter_Waveform   = 2,
 	kNumberOfParameters   = 3
 };
+
+#pragma mark ____TremoloUnit Factory Preset Constants
+
+	// Factory presets
+static const float kParameter_Preset_Frequency_Slow = 2.0;
+static const float kParameter_Preset_Frequency_Fast = 20.0;
+static const float kParameter_Preset_Depth_Slow     = 50.0;
+static const float kParameter_Preset_Depth_Fast     = 90.0;
+static const float kParameter_Preset_Waveform_Slow  = kSineWave_Tremolo_Waveform;
+static const float kParameter_Preset_Waveform_Fast  = kSquareWave_Tremolo_Waveform;
+
+enum
+{
+	kPreset_Slow    = 0,
+	kPreset_Fast    = 1,
+	kNumberPresets  = 2
+};
+
+static AUPreset kPresets [kNumberPresets] = { {kPreset_Slow, CFSTR ("Slow & Gentle")}, {kPreset_Fast, CFSTR ("Fast & Hard")}};
+
+static const int kPreset_Default = kPreset_Slow;
+
+

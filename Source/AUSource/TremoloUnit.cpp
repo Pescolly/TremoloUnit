@@ -62,19 +62,7 @@
 AUDIOCOMPONENT_ENTRY(AUBaseProcessFactory, TremoloUnit)
 
 
-// Factory presets
-static const int kPreset_One = 0;
-static const int kPreset_Two = 1;
-static const int kNumberPresets = 2;
 
-static AUPreset kPresets[kNumberPresets] = 
-    {
-        { kPreset_One, CFSTR("Preset One") },		
-        { kPreset_Two, CFSTR("Preset Two") }		
-	};
-	
-static const int kPresetDefault = kPreset_One;
-static const int kPresetDefaultIndex = 0;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #pragma mark ____Construction_Initialization
@@ -90,8 +78,6 @@ TremoloUnit::TremoloUnit(AudioUnit component) : AUEffectBase(component)
 	//
 	// these calls have the effect both of defining the parameters for the first time
 	// and assigning their initial values
-	//
-	// kTremoloUnitParam_CutoffFrequency max value depends on sample-rate
 	
 	CreateElements();
 	Globals()->UseIndexedParameters(kNumberOfParameters);
@@ -99,6 +85,8 @@ TremoloUnit::TremoloUnit(AudioUnit component) : AUEffectBase(component)
 	SetParameter(kParameter_Frequency, kDefaultValue_Tremolo_Freq);
 	SetParameter(kParameter_Depth, kDefaultValue_Tremolo_Depth);
 	SetParameter(kParameter_Waveform, kDefaultValue_Tremolo_Waveform);
+	
+	SetAFactoryPresetAsCurrent(kPresets[kPreset_Default]);
 	
 #if AU_DEBUG_DISPATCHER
 	mDebugDispatcher = new AUDebugDispatcher(this);
@@ -288,58 +276,66 @@ OSStatus			TremoloUnit::GetProperty (	AudioUnitPropertyID 		inID,
 	return AUEffectBase::GetProperty (inID, inScope, inElement, outData);
 }
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #pragma mark ____Presets
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //	TremoloUnit::GetPresets
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-OSStatus			TremoloUnit::GetPresets (		CFArrayRef * 		outData) const
+OSStatus TremoloUnit::GetPresets(CFArrayRef *outData) const
 {
 		// this is used to determine if presets are supported 
 		// which in this unit they are so we implement this method!
 	if (outData == NULL) return noErr;
 	
-	CFMutableArrayRef theArray = CFArrayCreateMutable (NULL, kNumberPresets, NULL);
-	for (int i = 0; i < kNumberPresets; ++i) {
-		CFArrayAppendValue (theArray, &kPresets[i]);
+	CFMutableArrayRef presetsArray = CFArrayCreateMutable(NULL, kNumberPresets, NULL);
+	for (int i = 0; i < kNumberPresets; ++i)
+	{
+		CFArrayAppendValue (presetsArray, &kPresets[i]);
     }
     
-	*outData = (CFArrayRef)theArray;	// client is responsible for releasing the array
+	*outData = (CFArrayRef)presetsArray;	// client is responsible for releasing the array
 	return noErr;
 }
-#pragma mark ____TremoloUnitNewFactoryPresetSet
 
+#pragma mark ____TremoloUnitNewFactoryPresetSet
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //	TremoloUnit::NewFactoryPresetSet
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-OSStatus	TremoloUnit::NewFactoryPresetSet (const AUPreset & inNewFactoryPreset)
+OSStatus TremoloUnit::NewFactoryPresetSet(const AUPreset &inNewFactoryPreset)
 {
 	SInt32 chosenPreset = inNewFactoryPreset.presetNumber;
 	
-	for(int i = 0; i < kNumberPresets; ++i)
+	if (chosenPreset == kPreset_Fast || chosenPreset == kPreset_Slow)
 	{
-		if(chosenPreset == kPresets[i].presetNumber)
+		for (int i = 0; i < kNumberPresets; ++i)
 		{
-			// set whatever state you need to based on this preset's selection
-			//
-			// Here we use a switch statement, but it would also be possible to
-			// use chosenPreset as an index into an array (if you publish the preset
-			// numbers as indices in the GetPresets() method)
-			//			
-			switch(chosenPreset)
+			if (chosenPreset == kPresets[i].presetNumber)
 			{
-				case kPreset_One:
-					break;
-				case kPreset_Two:
-					break;
+					// set whatever state you need to based on this preset's selection
+					//
+					// Here we use a switch statement, but it would also be possible to
+					// use chosenPreset as an index into an array (if you publish the preset
+					// numbers as indices in the GetPresets() method)
+					//
+				switch(chosenPreset)
+				{
+					case kPreset_Fast:
+						SetParameter(kParameter_Waveform, kParameter_Preset_Waveform_Fast);
+						SetParameter(kParameter_Frequency, kParameter_Preset_Frequency_Fast);
+						SetParameter(kParameter_Depth, kParameter_Preset_Depth_Fast);
+						break;
+						
+					case kPreset_Slow:
+						SetParameter(kParameter_Waveform, kParameter_Preset_Waveform_Slow);
+						SetParameter(kParameter_Frequency, kParameter_Preset_Frequency_Slow);
+						SetParameter(kParameter_Depth, kParameter_Preset_Depth_Slow);
+						break;
+				}
+				
+				SetAFactoryPresetAsCurrent(kPresets[i]);
+				return noErr;
 			}
-            
-            SetAFactoryPresetAsCurrent (kPresets[i]);
-			return noErr;
 		}
 	}
 	
