@@ -33,10 +33,6 @@ public:
 	
 		// resets the TremoloUnit state
 	virtual void		Reset();
-	
-	
-	
-private:
 };
 
 
@@ -85,8 +81,13 @@ public:
 		// A lookahead compressor or FFT-based processor should report the true latency in seconds
 	virtual Float64				GetLatency() {return 0.0;}
 	
+		//let audio units generic view display options as popup
+	ComponentResult 			GetParameterValueStrings (
+														   AudioUnitScope          inScope,
+														   AudioUnitParameterID    inParameterID,
+														   CFArrayRef              *outStrings
+														   );
 	
-protected:
 };
 
 

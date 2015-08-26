@@ -62,18 +62,6 @@
 AUDIOCOMPONENT_ENTRY(AUBaseProcessFactory, TremoloUnit)
 
 
-enum
-{
-	kTremoloUnitParam_CutoffFrequency = 0,
-	kTremoloUnitParam_Resonance = 1
-};
-
-
-static CFStringRef kCutoffFreq_Name = CFSTR("cutoff frequency");
-static CFStringRef kResonance_Name = CFSTR("resonance");
-
-
-
 // Factory presets
 static const int kPreset_One = 0;
 static const int kPreset_Two = 1;
@@ -105,15 +93,24 @@ TremoloUnit::TremoloUnit(AudioUnit component) : AUEffectBase(component)
 	//
 	// kTremoloUnitParam_CutoffFrequency max value depends on sample-rate
 	
+	CreateElements();
+	Globals()->UseIndexedParameters(kNumberOfParameters);
 	
-	SetParamHasSampleRateDependency(true );
+	SetParameter(kParameter_Frequency, kDefaultValue_Tremolo_Freq);
+	SetParameter(kParameter_Depth, kDefaultValue_Tremolo_Depth);
+	SetParameter(kParameter_Waveform, kDefaultValue_Tremolo_Waveform);
+	
+#if AU_DEBUG_DISPATCHER
+	mDebugDispatcher = new AUDebugDispatcher(this);
+#endif
+
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //	TremoloUnit::Initialize
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-OSStatus			TremoloUnit::Initialize()
+OSStatus TremoloUnit::Initialize()
 {
 	OSStatus result = AUEffectBase::Initialize();
 	
@@ -134,38 +131,49 @@ OSStatus			TremoloUnit::Initialize()
 //	TremoloUnit::GetParameterInfo
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-OSStatus			TremoloUnit::GetParameterInfo(	AudioUnitScope			inScope,
-												AudioUnitParameterID	inParameterID,
-												AudioUnitParameterInfo	&outParameterInfo )
+OSStatus TremoloUnit::GetParameterInfo( AudioUnitScope inScope, AudioUnitParameterID inParameterID,
+									   AudioUnitParameterInfo &outParameterInfo )
 {
-	OSStatus result = noErr;
-
-	outParameterInfo.flags = 	kAudioUnitParameterFlag_IsWritable
-						+		kAudioUnitParameterFlag_IsReadable;
+	ComponentResult result = noErr;
+	
+	outParameterInfo.flags = kAudioUnitParameterFlag_IsWritable | kAudioUnitParameterFlag_IsReadable;
 		
-	if (inScope == kAudioUnitScope_Global) {
-		
+	if (inScope == kAudioUnitScope_Global)
+	{
 		switch(inParameterID)
 		{
-			case kTremoloUnitParam_CutoffFrequency:
-				AUBase::FillInParameterName (outParameterInfo, kCutoffFreq_Name, false);
+			case kParameter_Frequency:
+				AUBase::FillInParameterName(outParameterInfo, kParamName_Tremolo_Freq, false);
 				outParameterInfo.unit = kAudioUnitParameterUnit_Hertz;
-				outParameterInfo.maxValue = GetSampleRate() * 0.5;
-				outParameterInfo.flags += kAudioUnitParameterFlag_IsHighResolution;
-				outParameterInfo.flags += kAudioUnitParameterFlag_DisplayLogarithmic;
+				outParameterInfo.defaultValue = kDefaultValue_Tremolo_Freq;
+				outParameterInfo.maxValue = kMaximumValue_Tremolo_Freq;
+				outParameterInfo.minValue = kMinimumValue_Tremolo_Freq;
+				outParameterInfo.flags |= kAudioUnitParameterFlag_DisplayLogarithmic;
 				break;
 				
-			case kTremoloUnitParam_Resonance:
-				AUBase::FillInParameterName (outParameterInfo, kResonance_Name, false);
-				outParameterInfo.unit = kAudioUnitParameterUnit_Decibels;
-				outParameterInfo.flags += kAudioUnitParameterFlag_IsHighResolution;
+			case kParameter_Depth:
+				AUBase::FillInParameterName (outParameterInfo, kParamName_Tremolo_Depth, false);
+				outParameterInfo.unit = kAudioUnitParameterUnit_Percent;
+				outParameterInfo.defaultValue = kDefaultValue_Tremolo_Depth;
+				outParameterInfo.minValue = kMinimumValue_Tremolo_Depth;
+				outParameterInfo.maxValue = kMaximumValue_Tremolo_Depth;
+				break;
+				
+			case kParameter_Waveform:
+				AUBase::FillInParameterName(outParameterInfo, kParamName_Tremolo_Waveform, false);
+				outParameterInfo.unit = kAudioUnitParameterUnit_Indexed;
+				outParameterInfo.defaultValue = kDefaultValue_Tremolo_Waveform;
+				outParameterInfo.minValue = kSineWave_Tremolo_Waveform;
+				outParameterInfo.maxValue = kSquareWave_Tremolo_Waveform;
 				break;
 				
 			default:
 				result = kAudioUnitErr_InvalidParameter;
 				break;
 		}
-	} else {
+	}
+	else
+	{
 		result = kAudioUnitErr_InvalidParameter;
 	}
 	
@@ -179,11 +187,8 @@ OSStatus			TremoloUnit::GetParameterInfo(	AudioUnitScope			inScope,
 //	TremoloUnit::GetPropertyInfo
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-OSStatus			TremoloUnit::GetPropertyInfo (	AudioUnitPropertyID				inID,
-												AudioUnitScope					inScope,
-												AudioUnitElement				inElement,
-												UInt32 &						outDataSize,
-												Boolean &						outWritable)
+OSStatus TremoloUnit::GetPropertyInfo (	AudioUnitPropertyID	inID, AudioUnitScope inScope,
+									AudioUnitElement inElement,UInt32 &outDataSize, Boolean &outWritable)
 {
 	if (inScope == kAudioUnitScope_Global)
 	{
@@ -305,6 +310,7 @@ OSStatus			TremoloUnit::GetPresets (		CFArrayRef * 		outData) const
 	*outData = (CFArrayRef)theArray;	// client is responsible for releasing the array
 	return noErr;
 }
+#pragma mark ____TremoloUnitNewFactoryPresetSet
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //	TremoloUnit::NewFactoryPresetSet
@@ -327,12 +333,8 @@ OSStatus	TremoloUnit::NewFactoryPresetSet (const AUPreset & inNewFactoryPreset)
 			switch(chosenPreset)
 			{
 				case kPreset_One:
-					SetParameter(kTremoloUnitParam_CutoffFrequency, 200.0 );
-					SetParameter(kTremoloUnitParam_Resonance, -5.0 );
 					break;
 				case kPreset_Two:
-					SetParameter(kTremoloUnitParam_CutoffFrequency, 1000.0 );
-					SetParameter(kTremoloUnitParam_Resonance, 10.0 );
 					break;
 			}
             
@@ -342,6 +344,31 @@ OSStatus	TremoloUnit::NewFactoryPresetSet (const AUPreset & inNewFactoryPreset)
 	}
 	
 	return kAudioUnitErr_InvalidPropertyValue;
+}
+
+#pragma mark ____TremoloUnitGetParameterAccessStrings
+
+/*	
+ *TremoloUnit::GetParameterValueStrings()
+ */
+ComponentResult TremoloUnit::GetParameterValueStrings(AudioUnitScope inScope, AudioUnitParameterID inParameterID,
+													  CFArrayRef *outStrings)
+{
+	if((inScope == kAudioUnitScope_Global) && (inParameterID == kParameter_Waveform))
+	{
+		if (outStrings == NULL)
+		{
+			return noErr;
+		}
+		
+		CFStringRef strings[] = { kMenuItem_Tremolo_Sine, kMenuItem_Tremolo_Square };
+		
+		*outStrings = CFArrayCreate(NULL, (const void **) strings, (sizeof(strings) / sizeof(strings[0])), NULL);
+		
+		return noErr;
+	}
+	
+	return kAudioUnitErr_InvalidParameter;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -366,7 +393,7 @@ TremoloUnitKernel::~TremoloUnitKernel( )
 {
 }
 
-
+#pragma mark ____TremoloUnitKernelReset
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //	TremoloUnitKernel::Reset()
 //
@@ -381,22 +408,16 @@ void		TremoloUnitKernel::Reset()
 
 
 
-
-
+#pragma mark ____TremoloUnitKernelProcess
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //	TremoloUnitKernel::Process(int inFramesToProcess)
 //
 //		We process one non-interleaved stream at a time
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void TremoloUnitKernel::Process(	const Float32 	*inSourceP,
-							Float32 		*inDestP,
-							UInt32 			inFramesToProcess,
-							UInt32			inNumChannels,	// for version 2 AudioUnits inNumChannels is always 1
-							bool &			ioSilence)
+void TremoloUnitKernel::Process( const Float32 	*inSourceP, Float32 *inDestP, UInt32 inFramesToProcess,
+							UInt32 inNumChannels, bool &ioSilence)
 {
-	double cutoff = GetParameter(kTremoloUnitParam_CutoffFrequency);
-    double resonance = GetParameter(kTremoloUnitParam_Resonance );
-    
+	
 	// do bounds checking on parameters
 	//
 }
