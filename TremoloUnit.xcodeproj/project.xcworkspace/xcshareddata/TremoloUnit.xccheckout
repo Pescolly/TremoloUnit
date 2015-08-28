@@ -10,6 +10,8 @@
 	<string>TremoloUnit</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>9583E16436A1FEFEE0BC2ACBFC2C1521F87E1B2B</key>
+		<string>https://github.com/Pescolly/CoreAudioUtilityClasses.git</string>
 		<key>E08711F8A2F2BB2EE92E35EFBEB3A387E9BA8DDE</key>
 		<string>https://github.com/Pescolly/TremoloUnit.git</string>
 	</dict>
@@ -17,6 +19,8 @@
 	<string>TremoloUnit.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
+		<key>9583E16436A1FEFEE0BC2ACBFC2C1521F87E1B2B</key>
+		<string>../../../CoreAudioUtilityClasses</string>
 		<key>E08711F8A2F2BB2EE92E35EFBEB3A387E9BA8DDE</key>
 		<string>../..</string>
 	</dict>
@@ -28,6 +32,14 @@
 	<string>E08711F8A2F2BB2EE92E35EFBEB3A387E9BA8DDE</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>9583E16436A1FEFEE0BC2ACBFC2C1521F87E1B2B</string>
+			<key>IDESourceControlWCCName</key>
+			<string>CoreAudioUtilityClasses</string>
+		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>

@@ -30,6 +30,17 @@ public:
 	
 		// resets the TremoloUnit state
 	virtual void		Reset();
+
+private:
+	enum { kWaveArraySize = 2000 };				//size of waveform in wavetable
+	float mSineWavetable[kWaveArraySize];				//wave table for sin wave
+	float mSquareWavetable[kWaveArraySize];
+	float *waveArrayPointer;					//wave table to apply to current audio input buffer
+	Float32 mSampleFrequency;					//sample rate of the audio to be processed
+	long mSamplesProcessed;						//number of samples processed since start of render
+	enum { sampleLimit = (int) 10E6 };			//keep track of mSamplesProcessed
+	float mCurrentScale;						//correlate points in the wave table with the audio signal sampling freq.
+	float mNextScale;							//new scale requested by user
 };
 
 

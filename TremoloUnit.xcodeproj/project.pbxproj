@@ -345,9 +345,9 @@
 		08FB77ADFE841716C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				C0C4C65B1B8AD57600A5669B /* CoreAudioUtilityClasses */,
 				8BA05A56072072A900365D66 /* AU Source */,
 				8BA4ADCB073EB14C00A2709A /* CocoaUI */,
+				C0C4C65B1B8AD57600A5669B /* CoreAudioUtilityClasses */,
 				32BAE0B30371A71500C91783 /* TremoloUnit_Prefix.pch */,
 			);
 			name = Source;

@@ -375,10 +375,33 @@ ComponentResult TremoloUnit::GetParameterValueStrings(AudioUnitScope inScope, Au
 //	TremoloUnitKernel::TremoloUnitKernel()
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-TremoloUnitKernel::TremoloUnitKernel(AUEffectBase *inAudioUnit )
-	: AUKernelBase(inAudioUnit)
+TremoloUnitKernel::TremoloUnitKernel(AUEffectBase *inAudioUnit ) : AUKernelBase(inAudioUnit), mSamplesProcessed(0), mCurrentScale(0)	//call superclasses and init two member vars
 {
-	Reset();
+	for (int i = 0; i < kWaveArraySize; ++i)	//generates a wave table that represnets one cycle of a sin wave, normalized to 0<->1
+	{
+		double radians = i * 2.0 * M_PI / kWaveArraySize;
+		mSineWavetable[i] = (sin (radians) + 1.0) * 0.5;
+	}
+	
+	for (int i = 0; i < kWaveArraySize; ++i)	//generates a wave table that represents one cycle of a pseudo square wave normalized to 0<->1
+	{
+		double radians = i * 2.0 * M_PI / kWaveArraySize;
+		radians += 0.32;
+		mSquareWavetable[i] =
+		(
+			sin(radians) +
+			0.3 * sin(3 * radians) +
+			0.15 * sin(5 * radians) +
+			0.075 * sin(7 * radians) +
+			0.0375 * sin(9 * radians) +
+			0.01875 * sin(11 * radians) +
+			0.009375 * sin(13 * radians) +
+			0.8
+		 ) * .63;
+	}
+	
+	mSampleFrequency = GetSampleRate();					//gets the sample rate for audio stream to be processed
+
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -410,10 +433,80 @@ void		TremoloUnitKernel::Reset()
 //
 //		We process one non-interleaved stream at a time
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void TremoloUnitKernel::Process( const Float32 	*inSourceP, Float32 *inDestP, UInt32 inFramesToProcess,
+void TremoloUnitKernel::Process(const Float32 	*inSourceP, Float32 *inDestP, UInt32 inSamplesToProcess,
 							UInt32 inNumChannels, bool &ioSilence)
 {
+	if (!ioSilence)														//ignore request if ioSilence
+	{
+		const Float32 *sourceP = inSourceP;								//assign pointer to start of sample input buffer
+		
+		Float32 *destP = inDestP, inputSample, outputSample, tremoloFrequency, tremoloDepth,
+		samplesPerCycle, rawTremoloGain, tremoloGain;
+		
+		int tremoloWaveform;
+		
+		tremoloFrequency = GetParameter(kParameter_Frequency);			//get freq/depth/waveform from UI params
+		tremoloDepth = GetParameter(kParameter_Depth);
+		tremoloWaveform = (int) GetParameter(kParameter_Waveform);
 	
-	// do bounds checking on parameters
-	//
+		if (tremoloWaveform != kSineWave_Tremolo_Waveform && tremoloWaveform != kSquareWave_Tremolo_Waveform)
+			tremoloWaveform = kSquareWave_Tremolo_Waveform;									//assign default waveform
+		
+		if (tremoloWaveform == kSineWave_Tremolo_Waveform)							//set waveArrayPointer to wavetable
+		{
+			waveArrayPointer = &mSineWavetable[0];
+		}
+		else
+		{
+			waveArrayPointer = &mSquareWavetable[0];
+		}
+		
+		if (tremoloFrequency < kMinimumValue_Tremolo_Freq)							//constrain parameters
+			tremoloFrequency = kMinimumValue_Tremolo_Freq;
+		if (tremoloFrequency > kMaximumValue_Tremolo_Freq)
+			tremoloFrequency = kMaximumValue_Tremolo_Freq;
+		
+		
+		if (tremoloDepth < kMinimumValue_Tremolo_Depth)
+			tremoloDepth = kMinimumValue_Tremolo_Depth;
+		if (tremoloDepth > kMaximumValue_Tremolo_Depth)
+			tremoloDepth = kMaximumValue_Tremolo_Depth;
+	
+		samplesPerCycle = mSampleFrequency / tremoloFrequency;					//Calculates the number of audio samples per cycle of tremolo frequency.
+		mNextScale = kWaveArraySize / samplesPerCycle;				//Calculates the scaling factor to use for applying the wave table to the current sampling frequency and tremolo frequency.
+
+		
+			//sample processing loop
+		for (int i = inSamplesToProcess; i > 0; i--)
+		{
+				//Calculates the point in the wave table to use for the current sample.
+			int index = static_cast<long>(mSamplesProcessed * mCurrentScale) % kWaveArraySize;
+			
+				//Tests if the scaling factor should change, and if itÕs safe to change it at the current sample to avoid artifacts.
+				//If both conditions are met, switches the scaling factor and resets the mSamplesProcessed variable.
+			if ((mNextScale != mCurrentScale) && (index == 0))
+			{
+				mCurrentScale = mNextScale;
+				mSamplesProcessed = 0;
+			}
+			
+				//Tests if the mSamplesProcessed variable has grown to a large value, and if it's safe to reset it at the current sample to avoid artifacts.
+				//If both conditions are met, resets the mSamplesProcessed variable.
+			if ((mSamplesProcessed >= sampleLimit) && (index == 0))
+			{
+				mSamplesProcessed = 0;
+			}
+			
+			rawTremoloGain = waveArrayPointer[index];				//Gets the tremolo gain from the appropriate point in the wave table.
+			
+			tremoloGain = (rawTremoloGain * tremoloGain - tremoloDepth + 100.0) * 0.01;  //Adjusts the tremolo gain by applying the Depth parameter.
+			inputSample = *sourceP;										//Gets an audio sample from the appropriate spot in the audio sample input buffer.
+			outputSample = inputSample * tremoloGain;				//Calculates the corresponding output audio sample.
+			*destP = outputSample;						//Places the output audio sample at the appropriate spot in the audio sample output buffer.
+			
+			sourceP++;						//Increments the position counter for the audio sample input buffer.
+			destP++;						//Increments the position counter for the audio sample output buffer.
+			mSamplesProcessed++;			//increments the count of processed audio samples
+		}
+	}
 }
