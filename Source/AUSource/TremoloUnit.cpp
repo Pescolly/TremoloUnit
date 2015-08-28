@@ -422,7 +422,8 @@ TremoloUnitKernel::~TremoloUnitKernel( )
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void		TremoloUnitKernel::Reset()
 {
-
+	mCurrentScale = 0;	//Resets the mCurrentScale member variable to its freshly initialized value.
+	mSamplesProcessed = 0;	//Resets the mSamplesProcessed member variable to its freshly initialized value.
 }
 
 
