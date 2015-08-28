@@ -59,8 +59,6 @@
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		32BAE0B30371A71500C91783 /* TremoloUnit_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TremoloUnit_Prefix.pch; sourceTree = "<group>"; };
 		4C56E7CA08047C7700DE6468 /* SectionPatternLight.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SectionPatternLight.tiff; sourceTree = "<group>"; };
-		4C56E7E6080482C100DE6468 /* AppleDemoFilter_GraphView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AppleDemoFilter_GraphView.h; path = Source/CocoaUI/AppleDemoFilter_GraphView.h; sourceTree = "<group>"; };
-		4C56E7E7080482C100DE6468 /* AppleDemoFilter_GraphView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = AppleDemoFilter_GraphView.m; path = Source/CocoaUI/AppleDemoFilter_GraphView.m; sourceTree = "<group>"; };
 		4C56E93A0804AE2C00DE6468 /* TremoloUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TremoloUnit.h; path = Source/AUSource/TremoloUnit.h; sourceTree = "<group>"; };
 		8BA05A660720730100365D66 /* TremoloUnit.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = TremoloUnit.cpp; path = Source/AUSource/TremoloUnit.cpp; sourceTree = "<group>"; };
 		8BA05A670720730100365D66 /* TremoloUnit.exp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.exports; path = TremoloUnit.exp; sourceTree = "<group>"; };
@@ -69,10 +67,6 @@
 		8BA05AFA072074E100365D66 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		8BA05AFB072074E100365D66 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
 		8BA05B01072074F900365D66 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
-		8BA4ADCE073EB19800A2709A /* AppleDemoFilter_ViewFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AppleDemoFilter_ViewFactory.h; path = Source/CocoaUI/AppleDemoFilter_ViewFactory.h; sourceTree = "<group>"; };
-		8BA4ADCF073EB19800A2709A /* AppleDemoFilter_ViewFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = AppleDemoFilter_ViewFactory.m; path = Source/CocoaUI/AppleDemoFilter_ViewFactory.m; sourceTree = "<group>"; };
-		8BA4ADD0073EB19800A2709A /* AppleDemoFilter_UIView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AppleDemoFilter_UIView.h; path = Source/CocoaUI/AppleDemoFilter_UIView.h; sourceTree = "<group>"; };
-		8BA4ADD1073EB19800A2709A /* AppleDemoFilter_UIView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = AppleDemoFilter_UIView.m; path = Source/CocoaUI/AppleDemoFilter_UIView.m; sourceTree = "<group>"; };
 		8BA4ADF4073EB43200A2709A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/CocoaView.nib; sourceTree = "<group>"; };
 		8BA4AE4F073EB69000A2709A /* CocoaFilterView.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = CocoaFilterView.plist; sourceTree = "<group>"; };
 		8BA4AE5B073EB79000A2709A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -346,7 +340,6 @@
 			isa = PBXGroup;
 			children = (
 				8BA05A56072072A900365D66 /* AU Source */,
-				8BA4ADCB073EB14C00A2709A /* CocoaUI */,
 				C0C4C65B1B8AD57600A5669B /* CoreAudioUtilityClasses */,
 				32BAE0B30371A71500C91783 /* TremoloUnit_Prefix.pch */,
 			);
@@ -370,19 +363,6 @@
 				8BA05A690720730100365D66 /* TremoloUnitVersion.h */,
 			);
 			name = "AU Source";
-			sourceTree = "<group>";
-		};
-		8BA4ADCB073EB14C00A2709A /* CocoaUI */ = {
-			isa = PBXGroup;
-			children = (
-				8BA4ADCE073EB19800A2709A /* AppleDemoFilter_ViewFactory.h */,
-				8BA4ADCF073EB19800A2709A /* AppleDemoFilter_ViewFactory.m */,
-				8BA4ADD0073EB19800A2709A /* AppleDemoFilter_UIView.h */,
-				8BA4ADD1073EB19800A2709A /* AppleDemoFilter_UIView.m */,
-				4C56E7E6080482C100DE6468 /* AppleDemoFilter_GraphView.h */,
-				4C56E7E7080482C100DE6468 /* AppleDemoFilter_GraphView.m */,
-			);
-			name = CocoaUI;
 			sourceTree = "<group>";
 		};
 		C0C4C65B1B8AD57600A5669B /* CoreAudioUtilityClasses */ = {
@@ -745,7 +725,7 @@
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0640;
 			};
 			buildConfigurationList = 3EED0949089806170095A620 /* Build configuration list for PBXProject "TremoloUnit" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -845,6 +825,7 @@
 				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/Components/";
 				LIBRARY_STYLE = Bundle;
 				MACOSX_DEPLOYMENT_TARGET = "";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-bundle";
 				PRODUCT_NAME = TremoloUnit;
 				REZ_SEARCH_PATHS = "";
@@ -870,6 +851,7 @@
 				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/Components/";
 				LIBRARY_STYLE = Bundle;
 				MACOSX_DEPLOYMENT_TARGET = "";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-bundle";
 				PRODUCT_NAME = TremoloUnit;
 				REZ_SEARCH_PATHS = "";
@@ -895,6 +877,7 @@
 				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/Components/";
 				LIBRARY_STYLE = Bundle;
 				MACOSX_DEPLOYMENT_TARGET = "";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-bundle";
 				PRODUCT_NAME = TremoloUnit;
 				REZ_SEARCH_PATHS = "";
@@ -910,7 +893,6 @@
 		3EED094A089806170095A620 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				EXPORTED_SYMBOLS_FILE = TremoloUnit.exp;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks $(inherited) @loader_path/../Frameworks";
 				MACH_O_TYPE = mh_bundle;
@@ -923,7 +905,6 @@
 		3EED094B089806170095A620 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				EXPORTED_SYMBOLS_FILE = TremoloUnit.exp;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks $(inherited) @loader_path/../Frameworks";
 				MACH_O_TYPE = mh_bundle;
@@ -936,7 +917,6 @@
 		3EED094C089806170095A620 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				EXPORTED_SYMBOLS_FILE = TremoloUnit.exp;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks $(inherited) @loader_path/../Frameworks";
 				MACH_O_TYPE = mh_bundle;

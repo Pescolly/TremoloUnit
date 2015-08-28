@@ -33,7 +33,7 @@ public:
 
 private:
 	enum { kWaveArraySize = 2000 };				//size of waveform in wavetable
-	float mSineWavetable[kWaveArraySize];				//wave table for sin wave
+	float mSineWavetable[kWaveArraySize];				//wavetables for sin/square waves
 	float mSquareWavetable[kWaveArraySize];
 	float *waveArrayPointer;					//wave table to apply to current audio input buffer
 	Float32 mSampleFrequency;					//sample rate of the audio to be processed

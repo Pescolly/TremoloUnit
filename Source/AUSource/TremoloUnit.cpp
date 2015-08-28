@@ -178,18 +178,7 @@ OSStatus TremoloUnit::GetParameterInfo( AudioUnitScope inScope, AudioUnitParamet
 OSStatus TremoloUnit::GetPropertyInfo (	AudioUnitPropertyID	inID, AudioUnitScope inScope,
 									AudioUnitElement inElement,UInt32 &outDataSize, Boolean &outWritable)
 {
-	if (inScope == kAudioUnitScope_Global)
-	{
-		switch (inID)
-		{
-			case kAudioUnitProperty_CocoaUI:
-				outWritable = false;
-				outDataSize = sizeof (AudioUnitCocoaViewInfo);
-				return noErr;
-
-		}
-	}
-	
+			// return default UI properties
 	return AUEffectBase::GetPropertyInfo (inID, inScope, inElement, outDataSize, outWritable);
 }
 
@@ -202,77 +191,7 @@ OSStatus			TremoloUnit::GetProperty (	AudioUnitPropertyID 		inID,
 											AudioUnitElement			inElement,
 											void *						outData)
 {
-	if (inScope == kAudioUnitScope_Global)
-	{
-		switch (inID)
-		{
-			// This property allows the host application to find the UI associated with this
-			// AudioUnit
-			//
-			case kAudioUnitProperty_CocoaUI:
-			{
-				// Look for a resource in the main bundle by name and type.
-				CFBundleRef bundle = CFBundleGetBundleWithIdentifier( CFSTR("com.greypool.audiounit.TremoloUnit") );
-				
-				if (bundle == NULL) return fnfErr;
-                
-				CFURLRef bundleURL = CFBundleCopyResourceURL( bundle, 
-                    CFSTR("CocoaTremoloUnitView"),	// this is the name of the cocoa bundle as specified in the CocoaViewFactory.plist
-                    CFSTR("bundle"),			// this is the extension of the cocoa bundle
-                    NULL);
-                
-                if (bundleURL == NULL) return fnfErr;
-                
-				CFStringRef className = CFSTR("AppleDemoTremoloUnit_ViewFactory");	// name of the main class that implements the AUCocoaUIBase protocol
-				AudioUnitCocoaViewInfo cocoaInfo = { bundleURL, { className } };
-				*((AudioUnitCocoaViewInfo *)outData) = cocoaInfo;
-				
-				return noErr;
-			}
-
-			// This is our custom property which reports the current frequency response curve
-			//
-/*			case kAudioUnitCustomProperty_TremoloUnitFrequencyResponse:
-			{
-				if(inScope != kAudioUnitScope_Global) 	return kAudioUnitErr_InvalidScope;
-
-				// the kernels are only created if we are initialized
-				// since we're using the kernels to get the curve info, let
-				// the caller know we can't do it if we're un-initialized
-				// the UI should check for the error and not draw the curve in this case
-				if(!IsInitialized() ) return kAudioUnitErr_Uninitialized;
-
-				FrequencyResponse *freqResponseTable = ((FrequencyResponse*)outData);
-
-				// each of our TremoloUnit kernel objects (one per channel) will have an identical frequency response
-				// so we arbitrarilly use the first one...
-				//
-				TremoloUnitKernel *TremoloUnitKernel = dynamic_cast<TremoloUnitKernel*>(mKernelList[0]);
-
-
-				double cutoff = GetParameter(kTremoloUnitParam_CutoffFrequency);
-				double resonance = GetParameter(kTremoloUnitParam_Resonance );
-
-				float srate = GetSampleRate();
-				
-				cutoff = 2.0 * cutoff / srate;
-				if(cutoff > 0.99) cutoff = 0.99;		// clip cutoff to highest allowed by sample rate...
-
-				TremoloUnitKernel->CalculateLopassParams(cutoff, resonance);
-				
-				for(int i = 0; i < kNumberOfResponseFrequencies; i++ )
-				{
-					double frequency = freqResponseTable[i].mFrequency;
-					
-					freqResponseTable[i].mMagnitude = TremoloUnitKernel->GetFrequencyResponse(frequency);
-				}
-
-				return noErr;
-			}*/
-		}
-	}
-	
-	// if we've gotten this far, handles the standard properties
+	// return default UI properties
 	return AUEffectBase::GetProperty (inID, inScope, inElement, outData);
 }
 
@@ -500,7 +419,7 @@ void TremoloUnitKernel::Process(const Float32 	*inSourceP, Float32 *inDestP, UIn
 			
 			rawTremoloGain = waveArrayPointer[index];				//Gets the tremolo gain from the appropriate point in the wave table.
 			
-			tremoloGain = (rawTremoloGain * tremoloGain - tremoloDepth + 100.0) * 0.01;  //Adjusts the tremolo gain by applying the Depth parameter.
+			tremoloGain = (rawTremoloGain * tremoloDepth - tremoloDepth + 100.0) * 0.01;  //Adjusts the tremolo gain by applying the Depth parameter.
 			inputSample = *sourceP;										//Gets an audio sample from the appropriate spot in the audio sample input buffer.
 			outputSample = inputSample * tremoloGain;				//Calculates the corresponding output audio sample.
 			*destP = outputSample;						//Places the output audio sample at the appropriate spot in the audio sample output buffer.
